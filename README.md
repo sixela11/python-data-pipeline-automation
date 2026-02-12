@@ -80,11 +80,11 @@ Excel file: weekly_report_YYYYMMDD-YYYYMMDD.xlsx containing enriched record data
 Technologies Used
 
 Python 3.x
-pandas
-psycopg2
-openpyxl
-urllib3
-tqdm
+- pandas
+- psycopg2
+- openpyxl
+- urllib3
+- tqdm
 
 Sample Output
 
