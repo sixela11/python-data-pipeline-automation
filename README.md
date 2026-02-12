@@ -1,7 +1,7 @@
 # Python Data Pipeline Automation
 
 ## Overview
-This project demonstrates a **generic, portfolio-ready Python automation workflow** that performs:
+This project demonstrates a Python automation workflow that performs:
 
 - Database extraction of transactions or records within a dynamic weekly range.
 - REST API integration with authentication to enrich each record.
