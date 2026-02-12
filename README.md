@@ -87,5 +87,6 @@ urllib3
 tqdm
 
 Sample Output
+
 <img width="854" height="433" alt="image" src="https://github.com/user-attachments/assets/bdba0b85-adaa-4815-9fe6-a757639f313e" />
 
