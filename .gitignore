@@ -1,0 +1,16 @@
+# Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+
+# Excel or CSV output files
+*.xlsx
+*.csv
+
+# Configs containing credentials
+config.ini
