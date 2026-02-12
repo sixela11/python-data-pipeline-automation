@@ -1,4 +1,4 @@
-# Python Data Pipeline Automation (Portfolio Project)
+# Python Data Pipeline Automation
 
 ## Overview
 This project demonstrates a **generic, portfolio-ready Python automation workflow** that performs:
