@@ -87,18 +87,5 @@ urllib3
 tqdm
 
 Sample Output
-📅 WEEKLY RANGE (Previous Saturday → Friday)
-Start Date: 2026-01-31 00:00:00
-End   Date: 2026-02-06 23:59:59
-
-🔍 Running weekly query against the database...
-✅ SQL returned rows: 128
-🔁 Unique Record IDs in result: 115
-
-🔐 API authentication successful.
-🔁 Fetching record details for 115 unique IDs...
-
-Fetching records: 100%|█████████████████████████████████████████| 115/115 [00:13<00:00, 8.84ID/s]
-
-✅ Final combined output saved as weekly_report_20260131-20260206.xlsx
+<img width="854" height="433" alt="image" src="https://github.com/user-attachments/assets/bdba0b85-adaa-4815-9fe6-a757639f313e" />
 
