@@ -1,55 +1,86 @@
-import configparser
+import argparse
+import logging
+import os
+from dotenv import load_dotenv
 from tqdm import tqdm
+
+from logger import setup_logger
 from db import get_db_connection, fetch_transactions
 from api_client import APIClient
 from report_generator import ExcelReport
 from utils import get_previous_week_range, safe_json
 
-# Load config
-config = configparser.ConfigParser()
-config.read("config.ini")
-db_config = config["database"]
-net_conf = config["network"]
+# setup logging
+setup_logger()
 
-# Connect DB
-conn = get_db_connection(db_config)
+# load environment variables
+load_dotenv()
 
-# Compute previous week
-start_date, end_date = get_previous_week_range()
+def main():
+    parser = argparse.ArgumentParser(description="Transaction Failure Report Generator")
+    parser.add_argument("--start", help="Start date YYYY-MM-DD")
+    parser.add_argument("--end", help="End date YYYY-MM-DD")
+    args = parser.parse_args()
 
-# Fetch transactions
-failure_reasons = ["ERROR_TYPE_A", "ERROR_TYPE_B"]
-df = fetch_transactions(conn, start_date, end_date, failure_reasons)
-conn.close()
+    # DB config
+    db_config = {
+        "host": os.getenv("DB_HOST"),
+        "port": os.getenv("DB_PORT"),
+        "dbname": os.getenv("DB_NAME"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+    }
 
-if df.empty:
-    print("⚠ No transactions found")
-    exit()
+    conn = get_db_connection(db_config)
 
-# Authenticate API client
-client = APIClient(
-    net_conf["base_url"],
-    net_conf["auth_url"],
-    net_conf["client_id"],
-    net_conf["client_secret"]
-)
-client.authenticate()
+    # date range
+    if args.start and args.end:
+        start_date, end_date = args.start, args.end
+    else:
+        start_date, end_date = get_previous_week_range()
 
-# Prepare Excel report
-headers = ["Transaction ID", "Type", "Status", "Failure Reason", "Extra Info"]
-report = ExcelReport("weekly_report.xlsx", headers)
+    failure_reasons = ["ERROR_TYPE_A", "ERROR_TYPE_B"]
 
-# Fetch extra info from API
-for transaction_id in tqdm(df["transaction_id"].unique(), desc="Fetching records"):
-    fields = client.fetch_record(transaction_id)
-    row = [
-        transaction_id,
-        df.loc[df.transaction_id == transaction_id, "transaction_type"].values[0],
-        df.loc[df.transaction_id == transaction_id, "status"].values[0],
-        df.loc[df.transaction_id == transaction_id, "failure_reason"].values[0],
-        safe_json(fields, "extra_info")
-    ]
-    report.add_row(row)
+    df = fetch_transactions(conn, start_date, end_date, failure_reasons)
+    conn.close()
 
-# Save report
-report.save()
+    if df.empty:
+        logging.warning("No transactions found.")
+        return
+
+    # optimize lookup
+    lookup = df.set_index("transaction_id").to_dict("index")
+
+    # API client
+    client = APIClient(
+        os.getenv("API_BASE_URL"),
+        os.getenv("API_AUTH_URL"),
+        os.getenv("API_CLIENT_ID"),
+        os.getenv("API_CLIENT_SECRET"),
+    )
+
+    client.authenticate()
+
+    # report
+    report = ExcelReport(
+        "weekly_report.xlsx",
+        ["Transaction ID", "Type", "Status", "Failure Reason", "Extra Info"],
+    )
+
+    for tx_id in tqdm(lookup.keys(), desc="Fetching API records"):
+        fields = client.fetch_record(tx_id)
+        row_data = lookup[tx_id]
+
+        report.add_row([
+            tx_id,
+            row_data["transaction_type"],
+            row_data["status"],
+            row_data["failure_reason"],
+            safe_json(fields, "extra_info"),
+        ])
+
+    report.save()
+    logging.info("Report generated successfully.")
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -6,9 +5,10 @@ __pycache__/
 env/
 venv/
 
-# Output files
+# outputs
 *.xlsx
 *.csv
 
-# Config with secrets
+# secrets
+.env
 config.ini
