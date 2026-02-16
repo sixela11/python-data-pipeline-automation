@@ -1,18 +1,14 @@
-# Python cache and bytecode
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Virtual environments
 env/
 venv/
 
-# Excel or CSV output files
+# Output files
 *.xlsx
 *.csv
 
-# Configs containing credentials
+# Config with secrets
 config.ini
-  git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
